@@ -874,18 +874,18 @@ func (iamOS *IAMObjectStore) deleteGroupInfo(ctx context.Context, name string) e
 
 // Lists objects in the minioMetaBucket at the given path prefix. All returned
 // items have the pathPrefix removed from their names.
-func listIAMConfigItems(ctx context.Context, objAPI ObjectLayer, pathPrefix string) <-chan itemOrErr[string] {
-	ch := make(chan itemOrErr[string])
+func listIAMConfigItems(ctx context.Context, objAPI ObjectLayer, pathPrefix string) <-chan ItemOrErr[string] {
+	ch := make(chan ItemOrErr[string])
 
 	go func() {
 		defer xioutil.SafeClose(ch)
 
 		// Allocate new results channel to receive ObjectInfo.
-		objInfoCh := make(chan itemOrErr[ObjectInfo])
+		objInfoCh := make(chan ItemOrErr[ObjectInfo])
 
 		if err := objAPI.Walk(ctx, minioMetaBucket, pathPrefix, objInfoCh, WalkOptions{}); err != nil {
 			select {
-			case ch <- itemOrErr[string]{Err: err}:
+			case ch <- ItemOrErr[string]{Err: err}:
 			case <-ctx.Done():
 			}
 			return
@@ -894,7 +894,7 @@ func listIAMConfigItems(ctx context.Context, objAPI ObjectLayer, pathPrefix stri
 		for obj := range objInfoCh {
 			if obj.Err != nil {
 				select {
-				case ch <- itemOrErr[string]{Err: obj.Err}:
+				case ch <- ItemOrErr[string]{Err: obj.Err}:
 				case <-ctx.Done():
 					return
 				}
@@ -902,7 +902,7 @@ func listIAMConfigItems(ctx context.Context, objAPI ObjectLayer, pathPrefix stri
 			item := strings.TrimPrefix(obj.Item.Name, pathPrefix)
 			item = strings.TrimSuffix(item, SlashSeparator)
 			select {
-			case ch <- itemOrErr[string]{Item: item}:
+			case ch <- ItemOrErr[string]{Item: item}:
 			case <-ctx.Done():
 				return
 			}

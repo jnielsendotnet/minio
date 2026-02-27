@@ -2889,7 +2889,7 @@ func (s *replicationResyncer) resyncBucket(ctx context.Context, objectAPI Object
 		s.workerCh <- struct{}{}
 	}()
 	// Allocate new results channel to receive ObjectInfo.
-	objInfoCh := make(chan itemOrErr[ObjectInfo])
+	objInfoCh := make(chan ItemOrErr[ObjectInfo])
 	cfg, err := getReplicationConfig(ctx, opts.bucket)
 	if err != nil {
 		replLogIf(ctx, fmt.Errorf("replication resync of %s for arn %s failed with %w", opts.bucket, opts.arn, err))
@@ -3303,7 +3303,7 @@ func getReplicationDiff(ctx context.Context, objAPI ObjectLayer, bucket string, 
 		return nil, err
 	}
 
-	objInfoCh := make(chan itemOrErr[ObjectInfo], 10)
+	objInfoCh := make(chan ItemOrErr[ObjectInfo], 10)
 	if err := objAPI.Walk(ctx, bucket, opts.Prefix, objInfoCh, WalkOptions{}); err != nil {
 		replLogIf(ctx, err)
 		return nil, err

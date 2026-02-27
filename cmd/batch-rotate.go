@@ -357,7 +357,7 @@ func (r *BatchJobKeyRotateV1) Start(ctx context.Context, api ObjectLayer, job Ba
 
 	ctx, cancel := context.WithCancel(ctx)
 
-	results := make(chan itemOrErr[ObjectInfo], 100)
+	results := make(chan ItemOrErr[ObjectInfo], 100)
 	if err := api.Walk(ctx, r.Bucket, r.Prefix, results, WalkOptions{
 		Marker: lastObject,
 		Filter: selectObj,

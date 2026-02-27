@@ -30,7 +30,7 @@ func TestDynamicTimeoutSingleIncrease(t *testing.T) {
 
 	initial := timeout.Timeout()
 
-	for range dynamicTimeoutLogSize {
+	for range DynamicTimeoutLogSize {
 		timeout.LogFailure()
 	}
 
@@ -46,13 +46,13 @@ func TestDynamicTimeoutDualIncrease(t *testing.T) {
 
 	initial := timeout.Timeout()
 
-	for range dynamicTimeoutLogSize {
+	for range DynamicTimeoutLogSize {
 		timeout.LogFailure()
 	}
 
 	adjusted := timeout.Timeout()
 
-	for range dynamicTimeoutLogSize {
+	for range DynamicTimeoutLogSize {
 		timeout.LogFailure()
 	}
 
@@ -68,7 +68,7 @@ func TestDynamicTimeoutSingleDecrease(t *testing.T) {
 
 	initial := timeout.Timeout()
 
-	for range dynamicTimeoutLogSize {
+	for range DynamicTimeoutLogSize {
 		timeout.LogSuccess(20 * time.Second)
 	}
 
@@ -84,13 +84,13 @@ func TestDynamicTimeoutDualDecrease(t *testing.T) {
 
 	initial := timeout.Timeout()
 
-	for range dynamicTimeoutLogSize {
+	for range DynamicTimeoutLogSize {
 		timeout.LogSuccess(20 * time.Second)
 	}
 
 	adjusted := timeout.Timeout()
 
-	for range dynamicTimeoutLogSize {
+	for range DynamicTimeoutLogSize {
 		timeout.LogSuccess(20 * time.Second)
 	}
 
@@ -108,7 +108,7 @@ func TestDynamicTimeoutManyDecreases(t *testing.T) {
 
 	const successTimeout = 20 * time.Second
 	for range 100 {
-		for range dynamicTimeoutLogSize {
+		for range DynamicTimeoutLogSize {
 			timeout.LogSuccess(successTimeout)
 		}
 	}
@@ -151,7 +151,7 @@ func TestDynamicTimeoutHitMinimum(t *testing.T) {
 
 	const successTimeout = 20 * time.Second
 	for range 100 {
-		for range dynamicTimeoutLogSize {
+		for range DynamicTimeoutLogSize {
 			timeout.LogSuccess(successTimeout)
 		}
 	}
@@ -163,10 +163,10 @@ func TestDynamicTimeoutHitMinimum(t *testing.T) {
 	}
 }
 
-func testDynamicTimeoutAdjust(t *testing.T, timeout *dynamicTimeout, f func() float64) {
+func testDynamicTimeoutAdjust(t *testing.T, timeout *DynamicTimeout, f func() float64) {
 	const successTimeout = 20 * time.Second
 
-	for range dynamicTimeoutLogSize {
+	for range DynamicTimeoutLogSize {
 		rnd := f()
 		duration := max(time.Duration(float64(successTimeout)*rnd), 100*time.Millisecond)
 		if duration >= time.Minute {

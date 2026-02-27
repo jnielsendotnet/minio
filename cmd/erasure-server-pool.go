@@ -2078,7 +2078,7 @@ func (z *erasureServerPools) DeleteBucket(ctx context.Context, bucket string, op
 	}
 
 	if !opts.Force {
-		results := make(chan itemOrErr[ObjectInfo])
+		results := make(chan ItemOrErr[ObjectInfo])
 
 		ctx, cancel := context.WithTimeout(ctx, time.Minute)
 		defer cancel()
@@ -2230,7 +2230,7 @@ func (z *erasureServerPools) HealBucket(ctx context.Context, bucket string, opts
 
 // Walk a bucket, optionally prefix recursively, until we have returned
 // all the contents of the provided bucket+prefix.
-func (z *erasureServerPools) Walk(ctx context.Context, bucket, prefix string, results chan<- itemOrErr[ObjectInfo], opts WalkOptions) error {
+func (z *erasureServerPools) Walk(ctx context.Context, bucket, prefix string, results chan<- ItemOrErr[ObjectInfo], opts WalkOptions) error {
 	if err := checkListObjsArgs(ctx, bucket, prefix, ""); err != nil {
 		xioutil.SafeClose(results)
 		return err
@@ -2352,7 +2352,7 @@ func (z *erasureServerPools) Walk(ctx context.Context, bucket, prefix string, re
 		sendErr := func(err error) {
 			if !sentErr {
 				select {
-				case results <- itemOrErr[ObjectInfo]{Err: err}:
+				case results <- ItemOrErr[ObjectInfo]{Err: err}:
 					sentErr = true
 				case <-parentCtx.Done():
 				}
@@ -2369,7 +2369,7 @@ func (z *erasureServerPools) Walk(ctx context.Context, bucket, prefix string, re
 		}()
 		send := func(oi ObjectInfo) bool {
 			select {
-			case results <- itemOrErr[ObjectInfo]{Item: oi}:
+			case results <- ItemOrErr[ObjectInfo]{Item: oi}:
 				return true
 			case <-ctx.Done():
 				sendErr(context.Cause(ctx))

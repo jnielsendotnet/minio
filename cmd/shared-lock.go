@@ -22,7 +22,7 @@ import (
 	"time"
 )
 
-var sharedLockTimeout = newDynamicTimeoutWithOpts(dynamicTimeoutOpts{
+var sharedLockTimeout = newDynamicTimeoutWithOpts(DynamicTimeoutOpts{
 	timeout:       30 * time.Second,
 	minimum:       10 * time.Second,
 	retryInterval: time.Minute,

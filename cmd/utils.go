@@ -1160,8 +1160,9 @@ func sleepContext(ctx context.Context, d time.Duration) error {
 	return nil
 }
 
-// helper type to return either item or error.
-type itemOrErr[V any] struct {
+// ItemOrErr is a helper type to return either item or error.
+// Exported to allow external ObjectLayer implementations.
+type ItemOrErr[V any] struct {
 	Item V
 	Err  error
 }

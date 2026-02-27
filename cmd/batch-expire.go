@@ -561,14 +561,14 @@ func (r *BatchJobExpire) Start(ctx context.Context, api ObjectLayer, job BatchJo
 	ctx, cancelCause := context.WithCancelCause(ctx)
 	defer cancelCause(nil)
 
-	results := make(chan itemOrErr[ObjectInfo], workerSize)
+	results := make(chan ItemOrErr[ObjectInfo], workerSize)
 	go func() {
 		prefixes := r.Prefix.F()
 		if len(prefixes) == 0 {
 			prefixes = []string{""}
 		}
 		for _, prefix := range prefixes {
-			prefixResultCh := make(chan itemOrErr[ObjectInfo], workerSize)
+			prefixResultCh := make(chan ItemOrErr[ObjectInfo], workerSize)
 			err := api.Walk(ctx, r.Bucket, prefix, prefixResultCh, WalkOptions{
 				Marker:       lastObject,
 				LatestOnly:   false, // we need to visit all versions of the object to implement purge: retainVersions

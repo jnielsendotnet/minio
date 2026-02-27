@@ -38,9 +38,9 @@ var globalLockServer *localLocker
 
 // RWLocker - locker interface to introduce GetRLock, RUnlock.
 type RWLocker interface {
-	GetLock(ctx context.Context, timeout *dynamicTimeout) (lkCtx LockContext, timedOutErr error)
+	GetLock(ctx context.Context, timeout *DynamicTimeout) (lkCtx LockContext, timedOutErr error)
 	Unlock(lkCtx LockContext)
-	GetRLock(ctx context.Context, timeout *dynamicTimeout) (lkCtx LockContext, timedOutErr error)
+	GetRLock(ctx context.Context, timeout *DynamicTimeout) (lkCtx LockContext, timedOutErr error)
 	RUnlock(lkCtx LockContext)
 }
 
@@ -160,7 +160,7 @@ type distLockInstance struct {
 }
 
 // Lock - block until write lock is taken or timeout has occurred.
-func (di *distLockInstance) GetLock(ctx context.Context, timeout *dynamicTimeout) (LockContext, error) {
+func (di *distLockInstance) GetLock(ctx context.Context, timeout *DynamicTimeout) (LockContext, error) {
 	lockSource := getSource(2)
 	start := UTCNow()
 
@@ -189,7 +189,7 @@ func (di *distLockInstance) Unlock(lc LockContext) {
 }
 
 // RLock - block until read lock is taken or timeout has occurred.
-func (di *distLockInstance) GetRLock(ctx context.Context, timeout *dynamicTimeout) (LockContext, error) {
+func (di *distLockInstance) GetRLock(ctx context.Context, timeout *DynamicTimeout) (LockContext, error) {
 	lockSource := getSource(2)
 	start := UTCNow()
 
@@ -242,7 +242,7 @@ func (n *nsLockMap) NewNSLock(lockers func() ([]dsync.NetLocker, string), volume
 }
 
 // Lock - block until write lock is taken or timeout has occurred.
-func (li *localLockInstance) GetLock(ctx context.Context, timeout *dynamicTimeout) (_ LockContext, timedOutErr error) {
+func (li *localLockInstance) GetLock(ctx context.Context, timeout *DynamicTimeout) (_ LockContext, timedOutErr error) {
 	lockSource := getSource(2)
 	start := UTCNow()
 	const readLock = false
@@ -278,7 +278,7 @@ func (li *localLockInstance) Unlock(lc LockContext) {
 }
 
 // RLock - block until read lock is taken or timeout has occurred.
-func (li *localLockInstance) GetRLock(ctx context.Context, timeout *dynamicTimeout) (_ LockContext, timedOutErr error) {
+func (li *localLockInstance) GetRLock(ctx context.Context, timeout *DynamicTimeout) (_ LockContext, timedOutErr error) {
 	lockSource := getSource(2)
 	start := UTCNow()
 	const readLock = true

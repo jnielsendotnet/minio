@@ -1161,8 +1161,8 @@ func (r *BatchJobReplicateV1) Start(ctx context.Context, api ObjectLayer, job Ba
 	for attempts := 1; attempts <= retryAttempts; attempts++ {
 		attempts := attempts
 		var (
-			walkCh = make(chan itemOrErr[ObjectInfo], 100)
-			slowCh = make(chan itemOrErr[ObjectInfo], 100)
+			walkCh = make(chan ItemOrErr[ObjectInfo], 100)
+			slowCh = make(chan ItemOrErr[ObjectInfo], 100)
 		)
 
 		if r.Source.Snowball.Disable != nil && !*r.Source.Snowball.Disable && r.Source.Type.isMinio() && r.Target.Type.isMinio() {
@@ -1188,7 +1188,7 @@ func (r *BatchJobReplicateV1) Start(ctx context.Context, api ObjectLayer, job Ba
 						if err := r.writeAsArchive(ctx, api, cl, batch, r.Target.Prefix); err != nil {
 							batchLogOnceIf(ctx, err, job.ID+"writeAsArchive")
 							for _, b := range batch {
-								slowCh <- itemOrErr[ObjectInfo]{Item: b}
+								slowCh <- ItemOrErr[ObjectInfo]{Item: b}
 							}
 						} else {
 							ri.trackCurrentBucketBatch(r.Source.Bucket, batch)
@@ -1244,7 +1244,7 @@ func (r *BatchJobReplicateV1) Start(ctx context.Context, api ObjectLayer, job Ba
 				prefixes = []string{""}
 			}
 			for _, prefix := range prefixes {
-				prefixWalkCh := make(chan itemOrErr[ObjectInfo], 100)
+				prefixWalkCh := make(chan ItemOrErr[ObjectInfo], 100)
 				if err := api.Walk(ctx, r.Source.Bucket, prefix, prefixWalkCh, WalkOptions{
 					Marker:   lastObject,
 					Filter:   selectObj,
@@ -1613,7 +1613,7 @@ func (a adminAPIHandlers) ListBatchJobs(w http.ResponseWriter, r *http.Request) 
 
 	jobType := r.Form.Get("jobType")
 
-	resultCh := make(chan itemOrErr[ObjectInfo])
+	resultCh := make(chan ItemOrErr[ObjectInfo])
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -1907,7 +1907,7 @@ func (j *BatchJobPool) cleanupReports(randomWait func() time.Duration) {
 		case <-GlobalContext.Done():
 			return
 		case <-t.C:
-			results := make(chan itemOrErr[ObjectInfo], 100)
+			results := make(chan ItemOrErr[ObjectInfo], 100)
 			ctx, cancel := context.WithCancel(j.ctx)
 			defer cancel()
 			if err := j.objLayer.Walk(ctx, minioMetaBucket, batchJobReportsPrefix, results, WalkOptions{}); err != nil {
@@ -1938,7 +1938,7 @@ func (j *BatchJobPool) cleanupReports(randomWait func() time.Duration) {
 func (j *BatchJobPool) resume(randomWait func() time.Duration) {
 	time.Sleep(randomWait())
 
-	results := make(chan itemOrErr[ObjectInfo], 100)
+	results := make(chan ItemOrErr[ObjectInfo], 100)
 	ctx, cancel := context.WithCancel(j.ctx)
 	defer cancel()
 	if err := j.objLayer.Walk(ctx, minioMetaBucket, batchJobPrefix, results, WalkOptions{}); err != nil {
@@ -2226,7 +2226,7 @@ func (m *batchJobMetrics) purgeJobMetrics() {
 
 // load metrics from disk on startup
 func (m *batchJobMetrics) init(ctx context.Context, objectAPI ObjectLayer) error {
-	resultCh := make(chan itemOrErr[ObjectInfo])
+	resultCh := make(chan ItemOrErr[ObjectInfo])
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
